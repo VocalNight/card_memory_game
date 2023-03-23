@@ -1,23 +1,44 @@
-import logo from './logo.svg';
+
+import { useState } from 'react';
 import './App.css';
+import GameContainer from './Components/GameContainer';
+import Header from './Components/Header';
+import GameStart from './Components/GameStart';
 
 function App() {
+  const [score, setScore] = useState(0);
+  const [highestScore, setHighestScore] = useState(0);
+  const [gameState, setGameState] = useState(0); //0 = being played, 1 = game ended
+  const [gameDifficulty, setGameDifficulty] = useState(0);
+
+  function scoreSetting(status) {
+    if (status) {
+      setScore(score + 1);
+    } else {
+      setScore(0);
+      setHighestScore(score > highestScore ? score : highestScore);
+    }
+
+  }
+
+  function gameDifficultyConfig(difficulty) {
+    setGameDifficulty(difficulty);
+  }
+
+ 
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <div>
+        <Header gameScore={score} highestScore={highestScore}/>
+      </div>
+      {gameDifficulty === 0 ? (
+        <div>
+        <GameStart setDifficulty={gameDifficultyConfig}/>
+      </div>
+      ) : (
+        <GameContainer gameStatus={scoreSetting} difficulty={gameDifficulty}/>
+      )}
     </div>
   );
 }
