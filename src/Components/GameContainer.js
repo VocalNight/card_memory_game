@@ -9,13 +9,13 @@ export default function GameContainer({ heroesList, gameStatus, difficulty }) {
   useEffect(() => {
     const setListDifficulty = async () => {
       
-      setPlayingList(heroesList.filter((hero) => hero.id < 1 + difficulty));
+      setPlayingList([...shuffle(heroesList)].slice(0, 1 + difficulty));
     };
     setListDifficulty();
   }, []);
 
   function resetGame() {
-    setPlayingList(heroesList.filter((hero) => hero.id < 1 + difficulty));
+    setPlayingList([...shuffle(heroesList)].slice(0, 1 + difficulty));
   }
 
   function setClicked(list, heroId, setFunction) {
