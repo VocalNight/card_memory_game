@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import './App.css';
 import GameContainer from './Components/GameContainer';
 import Header from './Components/Header';
@@ -10,6 +10,36 @@ function App() {
   const [highestScore, setHighestScore] = useState(0);
   const [gameState, setGameState] = useState(0); //0 = being played, 1 = game ended
   const [gameDifficulty, setGameDifficulty] = useState(0);
+  const [heroesList, setHeroesList] = useState([]);
+
+  useEffect(() => {
+    const loadHeroes = async () => {
+      setHeroesList(await fetchHeroes());
+    };
+
+    loadHeroes();
+  }, []);
+
+  const fetchHeroes = async () => {
+    const response = await fetch("https://api.opendota.com/api/heroStats");
+    const heroes = await response.json();
+
+    const cleanedList = heroes.map((hero) => {
+      let simplifiedName = hero.localized_name
+        .replace(/\s+/g, "_", "_")
+        .toLowerCase();
+      return {
+        id: hero.id,
+        name: hero.localized_name,
+        attribute: hero.primary_attr,
+        img: `images/heroes/${simplifiedName}.png`,
+        clicked: false,
+      };
+    });
+
+    return cleanedList;
+  };
+
 
   function scoreSetting(status) {
     if (status) {
@@ -37,7 +67,7 @@ function App() {
         <GameStart setDifficulty={gameDifficultyConfig}/>
       </div>
       ) : (
-        <GameContainer gameStatus={scoreSetting} difficulty={gameDifficulty}/>
+        <GameContainer heroesList={heroesList} gameStatus={scoreSetting} difficulty={gameDifficulty}/>
       )}
     </div>
   );

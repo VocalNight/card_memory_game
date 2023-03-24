@@ -1,71 +1,18 @@
 import { useEffect, useState } from "react";
-import AttributeView from "./AttributeView";
 import Card from "./Card";
 
-export default function GameContainer({ gameStatus, difficulty }) {
-  const [heroesList, setHeroesList] = useState([]);
-  const [strHeroes, setStrHeroes] = useState([]);
-  const [agiHeroes, setAgiHeroes] = useState([]);
-  const [intHeroes, setIntHeroes] = useState([]);
+export default function GameContainer({ heroesList, gameStatus, difficulty }) {
+
   const [level, setLevel] = useState(1);
   const [playingList, setPlayingList] = useState([]);
 
   useEffect(() => {
-    const loadHeroes = async () => {
-      setHeroesList(await fetchHeroes());
-    };
-
-    loadHeroes();
-  }, []);
-
-  useEffect(() => {
     const setListDifficulty = async () => {
-        while (playingList.length < 1 + difficulty) {
-            setPlayingList(playingList.concat(heroesList.find(hero => hero.id === Math.floor(Math.random() * 140))))
-        }
+      
       setPlayingList(heroesList.filter((hero) => hero.id < 1 + difficulty));
     };
     setListDifficulty();
-  }, [heroesList]);
-
-  const fetchHeroes = async () => {
-    const response = await fetch("https://api.opendota.com/api/heroStats");
-    const heroes = await response.json();
-
-    const cleanedList = heroes.map((hero) => {
-      let simplifiedName = hero.localized_name
-        .replace(/\s+/g, "_", "_")
-        .toLowerCase();
-      return {
-        id: hero.id,
-        name: hero.localized_name,
-        attribute: hero.primary_attr,
-        img: `images/heroes/${simplifiedName}.png`,
-        clicked: false,
-      };
-    });
-
-    return cleanedList;
-  };
-
-  function strHerosGenerate() {
-    setStrHeroes(heroesList.filter((hero) => hero.attribute === "str"));
-  }
-
-  function agiHerosGenerate() {
-    setAgiHeroes(heroesList.filter((hero) => hero.attribute === "agi"));
-  }
-
-  function intHerosGenerate() {
-    setIntHeroes(heroesList.filter((hero) => hero.attribute === "int"));
-  }
-
-  function showLists() {
-    console.log(heroesList);
-    console.log(strHeroes);
-    console.log(intHeroes);
-    console.log(agiHeroes);
-  }
+  }, []);
 
   function resetGame() {
     setPlayingList(heroesList.filter((hero) => hero.id < 1 + difficulty));
@@ -111,36 +58,12 @@ export default function GameContainer({ gameStatus, difficulty }) {
   }
 
   return (
-    <div>
-      {difficulty === 3 ? (
-        <div>
-          <h1>Strenght</h1>
-          <AttributeView
-            heroesList={strHeroes}
-            clickedFunction={setClicked}
-            setterFunction={setStrHeroes}
-          />
-          <h1>Agility</h1>
-          <AttributeView
-            heroesList={agiHeroes}
-            clickedFunction={setClicked}
-            setterFunction={setAgiHeroes}
-          />
-          <h1>Intelligence</h1>
-          <AttributeView
-            heroesList={intHeroes}
-            clickedFunction={setClicked}
-            setterFunction={setIntHeroes}
-          />
-          <button onClick={showLists}>Show lists</button>
-        </div>
-      ) : (
+    <div>  
         <Card
           cardList={playingList}
           clickedFunction={setClicked}
           setterFunction={setPlayingList}
         />
-      )}
     </div>
   );
 }
